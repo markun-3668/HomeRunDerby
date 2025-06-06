@@ -91,16 +91,13 @@
         log("WebGLテストページが開始されました");
         log("ブラウザ: " + navigator.userAgent);
         log("WebGL対応: " + (!!window.WebGLRenderingContext));
-        log("WebGL2対応: " + (!!window.WebGL2RenderingContext));
-
-        const buildUrl = "Build";
+        log("WebGL2対応: " + (!!window.WebGL2RenderingContext));        const buildUrl = "./Build";
         const loaderUrl = buildUrl + "/HomeRunDerby.loader.js";
         
         const config = {
             dataUrl: buildUrl + "/HomeRunDerby.data",
-            frameworkUrl: buildUrl + "/HomeRunDerby.framework.js",
-            codeUrl: buildUrl + "/HomeRunDerby.wasm",
-            streamingAssetsUrl: "StreamingAssets",
+            frameworkUrl: buildUrl + "/HomeRunDerby.framework.js",            codeUrl: buildUrl + "/HomeRunDerby.wasm",
+            streamingAssetsUrl: "./StreamingAssets",
             companyName: "DefaultCompany",
             productName: "Home Run Derby",
             productVersion: "0.1",

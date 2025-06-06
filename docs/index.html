@@ -6,8 +6,8 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Home Run Derby - Unity WebGL Game</title>
-    <link rel="shortcut icon" href="TemplateData/favicon.ico">
-    <link rel="stylesheet" href="TemplateData/style.css">
+    <link rel="shortcut icon" href="./TemplateData/favicon.ico">
+    <link rel="stylesheet" href="./TemplateData/style.css">
   </head>
   <body>
     <div id="unity-container" class="unity-desktop">
@@ -58,13 +58,13 @@
         updateBannerVisibility();
       }
 
-      var buildUrl = "Build";
+      var buildUrl = "./Build";
       var loaderUrl = buildUrl + "/HomeRunDerby.loader.js";
       var config = {
         dataUrl: buildUrl + "/HomeRunDerby.data",
         frameworkUrl: buildUrl + "/HomeRunDerby.framework.js",
         codeUrl: buildUrl + "/HomeRunDerby.wasm",
-        streamingAssetsUrl: "StreamingAssets",
+        streamingAssetsUrl: "./StreamingAssets",
         companyName: "DefaultCompany",
         productName: "Home Run Derby",
         productVersion: "0.1",
