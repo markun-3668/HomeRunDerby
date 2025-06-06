@@ -3,6 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Home Run Derby - Unity WebGL Game</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
@@ -64,9 +66,12 @@
         codeUrl: buildUrl + "/HomeRunDerby.wasm",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
-        productName: "Base Ball",
+        productName: "Home Run Derby",
         productVersion: "0.1",
         showBanner: unityShowBanner,
+        // メモリ設定の追加
+        initialMemorySize: 268435456, // 256MB
+        maximumMemorySize: 536870912, // 512MB
       };
 
       // By default, Unity keeps WebGL canvas render target size matched with
@@ -102,18 +107,33 @@
 
       var script = document.createElement("script");
       script.src = loaderUrl;
+      script.onerror = () => {
+        console.error("Failed to load Unity loader script:", loaderUrl);
+        unityShowBanner("Failed to load Unity loader script. Please check your internet connection and try again.", 'error');
+      };
       script.onload = () => {
-        createUnityInstance(canvas, config, (progress) => {
-          progressBarFull.style.width = 100 * progress + "%";
-              }).then((unityInstance) => {
-                loadingBar.style.display = "none";
-                fullscreenButton.onclick = () => {
-                  unityInstance.SetFullscreen(1);
-                };
-              }).catch((message) => {
-                alert(message);
-              });
+        console.log("Unity loader script loaded successfully");
+        try {
+          createUnityInstance(canvas, config, (progress) => {
+            console.log("Loading progress:", Math.round(progress * 100) + "%");
+            progressBarFull.style.width = 100 * progress + "%";
+          }).then((unityInstance) => {
+            console.log("Unity instance created successfully");
+            loadingBar.style.display = "none";
+            fullscreenButton.onclick = () => {
+              unityInstance.SetFullscreen(1);
             };
+          }).catch((message) => {
+            console.error("Unity instance creation failed:", message);
+            unityShowBanner("Game failed to load: " + message, 'error');
+            loadingBar.style.display = "none";
+          });
+        } catch (error) {
+          console.error("Error in createUnityInstance:", error);
+          unityShowBanner("Error loading game: " + error.message, 'error');
+          loadingBar.style.display = "none";
+        }
+      };
 
       document.body.appendChild(script);
 
