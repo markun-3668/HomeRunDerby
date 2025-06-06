@@ -14,7 +14,7 @@ Unityで開発した3Dホームランダービーゲームです。WebGLでビ�
 ## 🎯 プレイ方法
 
 **WebGL版（推奨）**
-[🎮 ゲームをプレイする](https://[あなたのGitHubユーザー名].github.io/HomeRunDerby/)
+[🎮 ゲームをプレイする](https://markun-3668.github.io/HomeRunDerby/)
 
 ブラウザ上で直接プレイできます。
 
@@ -80,4 +80,4 @@ python -m http.server 8000  # Python 3の場合
 ---
 
 💼 **就活ポートフォリオ用プロジェクト**  
-🔗 **GitHub Pages**: https://[あなたのGitHubユーザー名].github.io/HomeRunDerby/
+🔗 **GitHub Pages**: https://markun-3668.github.io/HomeRunDerby/
