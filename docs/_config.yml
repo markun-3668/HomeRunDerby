@@ -1,0 +1,29 @@
+# GitHub Pages configuration for Unity WebGL
+plugins:
+  - jekyll-redirect-from
+
+# MIME types for Unity WebGL files
+include:
+  - .wasm
+  - .data
+  - .js
+
+# Disable Jekyll processing for Build folder
+exclude:
+  - README.md
+  - Blender/
+  - Assets/
+  - Library/
+  - Logs/
+  - Packages/
+  - ProjectSettings/
+  - Temp/
+  - UserSettings/
+  - HomeRunDerby/
+
+# Allow Unity file extensions
+defaults:
+  - scope:
+      path: "Build"
+    values:
+      layout: null

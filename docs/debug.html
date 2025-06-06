@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build Files Test - Home Run Derby</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Unity WebGL Build Files Test</h1>
+    
+    <div class="test-section">
+        <h3>📁 ファイル存在チェック</h3>
+        <div id="file-check-results"></div>
+        <button onclick="checkFiles()">ファイルをチェック</button>
+    </div>
+
+    <div class="test-section">
+        <h3>🌐 ネットワーク環境</h3>
+        <div id="network-info"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🔍 ブラウザ情報</h3>
+        <div id="browser-info"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📋 ログ</h3>
+        <pre id="log-output"></pre>
+        <button onclick="clearLog()">ログクリア</button>
+    </div>
+
+    <script>
+        const logOutput = document.getElementById('log-output');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}\n`;
+            logOutput.textContent += logMessage;
+            logOutput.scrollTop = logOutput.scrollHeight;
+            
+            if (type === 'error') {
+                console.error(message);
+            } else if (type === 'warn') {
+                console.warn(message);
+            } else {
+                console.log(message);
+            }
+        }
+
+        function clearLog() {
+            logOutput.textContent = '';
+        }
+
+        // ブラウザ情報の表示
+        function displayBrowserInfo() {
+            const info = document.getElementById('browser-info');
+            const webglSupport = !!window.WebGLRenderingContext;
+            const webgl2Support = !!window.WebGL2RenderingContext;
+            const wasmSupport = typeof WebAssembly === 'object';
+            
+            info.innerHTML = `
+                <div class="status info">
+                    <strong>User Agent:</strong> ${navigator.userAgent}<br>
+                    <strong>URL:</strong> ${window.location.href}<br>
+                    <strong>Protocol:</strong> ${window.location.protocol}<br>
+                    <strong>WebGL Support:</strong> ${webglSupport ? '✅' : '❌'}<br>
+                    <strong>WebGL2 Support:</strong> ${webgl2Support ? '✅' : '❌'}<br>
+                    <strong>WebAssembly Support:</strong> ${wasmSupport ? '✅' : '❌'}
+                </div>
+            `;
+        }
+
+        // ネットワーク情報の表示
+        function displayNetworkInfo() {
+            const info = document.getElementById('network-info');
+            const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            
+            let networkInfo = `
+                <div class="status info">
+                    <strong>Online:</strong> ${navigator.onLine ? '✅' : '❌'}<br>
+                    <strong>Base URL:</strong> ${window.location.origin}<br>
+                    <strong>Current Path:</strong> ${window.location.pathname}
+            `;
+            
+            if (connection) {
+                networkInfo += `<br><strong>Connection Type:</strong> ${connection.effectiveType || 'Unknown'}`;
+                networkInfo += `<br><strong>Downlink:</strong> ${connection.downlink || 'Unknown'} Mbps`;
+            }
+            
+            networkInfo += `</div>`;
+            info.innerHTML = networkInfo;
+        }
+
+        // ファイル存在チェック
+        async function checkFiles() {
+            const results = document.getElementById('file-check-results');
+            results.innerHTML = '<div class="status info">ファイルをチェック中...</div>';
+            
+            const files = [
+                'Build/HomeRunDerby.loader.js',
+                'Build/HomeRunDerby.framework.js',
+                'Build/HomeRunDerby.data',
+                'Build/HomeRunDerby.wasm',
+                'TemplateData/style.css'
+            ];
+
+            let resultHTML = '';
+            
+            for (const file of files) {
+                try {
+                    log(`Checking file: ${file}`);
+                    const response = await fetch(file, { method: 'HEAD' });
+                    
+                    if (response.ok) {
+                        const size = response.headers.get('content-length');
+                        const contentType = response.headers.get('content-type');
+                        
+                        resultHTML += `
+                            <div class="status success">
+                                ✅ ${file}
+                                ${size ? `(${formatBytes(parseInt(size))})` : ''}
+                                ${contentType ? `- ${contentType}` : ''}
+                            </div>
+                        `;
+                        log(`✅ ${file} - OK (${size ? formatBytes(parseInt(size)) : 'size unknown'})`);
+                    } else {
+                        resultHTML += `
+                            <div class="status error">
+                                ❌ ${file} - HTTP ${response.status}: ${response.statusText}
+                            </div>
+                        `;
+                        log(`❌ ${file} - HTTP ${response.status}: ${response.statusText}`, 'error');
+                    }
+                } catch (error) {
+                    resultHTML += `
+                        <div class="status error">
+                            ❌ ${file} - Error: ${error.message}
+                        </div>
+                    `;
+                    log(`❌ ${file} - Error: ${error.message}`, 'error');
+                }
+            }
+            
+            results.innerHTML = resultHTML;
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            displayBrowserInfo();
+            displayNetworkInfo();
+            log('ページが読み込まれました');
+            log('テストを開始するには「ファイルをチェック」ボタンをクリックしてください');
+        });
+
+        // Unity Loaderの直接テスト
+        async function testUnityLoader() {
+            log('Unity Loaderの直接テストを開始...');
+            
+            try {
+                const script = document.createElement('script');
+                script.src = './Build/HomeRunDerby.loader.js';
+                
+                script.onload = function() {
+                    log('✅ Unity Loader script loaded successfully');
+                    
+                    if (typeof createUnityInstance === 'function') {
+                        log('✅ createUnityInstance function is available');
+                    } else {
+                        log('❌ createUnityInstance function is not available', 'error');
+                    }
+                };
+                
+                script.onerror = function() {
+                    log('❌ Failed to load Unity Loader script', 'error');
+                };
+                
+                document.head.appendChild(script);
+                
+            } catch (error) {
+                log(`❌ Error testing Unity Loader: ${error.message}`, 'error');
+            }
+        }
+
+        // ボタンを追加
+        window.addEventListener('load', function() {
+            const testSection = document.querySelector('.test-section:last-child');
+            const button = document.createElement('button');
+            button.textContent = 'Unity Loaderテスト';
+            button.onclick = testUnityLoader;
+            testSection.appendChild(button);
+        });
+    </script>
+</body>
+</html>
